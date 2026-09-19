@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examate AI Tutor | Student Academic Mentor</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/tutor.css">
+</head>
+<body>
+
+<div class="tutor-layout">
+  
+  <!-- Sidebar -->
+  <aside class="tutor-sidebar">
+    <div class="tutor-logo">
+      <img src="assets/logo.png" alt="Aethon Logo">
+      <span>AI Tutor</span>
+    </div>
+
+    <!-- AI ENGINE READ-ONLY CARD (Configured in Profile) -->
+    <div class="ai-provider-card">
+      <div class="card-header-sm">
+        <i class="ri-cpu-line" style="color: #a78bfa;"></i>
+        <span>ACTIVE AI ENGINE</span>
+      </div>
+      
+      <div id="sidebar-active-engine" style="font-size: 13px; font-weight: 600; color: #fff; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        Google Gemini
+      </div>
+
+      <div class="key-status-row" style="margin-top: 8px;">
+        <span class="status-indicator" id="key-status-text">✓ System Key Active</span>
+        <a href="profile.html" style="font-size: 11px; color: #a78bfa; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+          <i class="ri-settings-3-line"></i> Profile
+        </a>
+      </div>
+    </div>
+
+    <button class="btn-new-chat" onclick="startNewChat()">
+      <i class="ri-add-line"></i> New Learning Chat
+    </button>
+
+    <div style="font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 8px; font-weight: 700; padding-left: 4px;">
+      Chat History
+    </div>
+
+    <div class="history-list" id="history-list">
+      <!-- Loaded dynamically -->
+    </div>
+
+    <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08);">
+      <a href="dashboard.html" style="color: #a78bfa; text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+        <i class="ri-arrow-left-line"></i> Return to Dashboard
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Chat Area -->
+  <main class="tutor-main">
+    
+    <!-- Top Header -->
+    <header class="tutor-header">
+      <div class="tutor-header-title">
+        <i class="ri-robot-2-line" style="font-size: 22px; color: #a78bfa;"></i>
+        <span>Examate Academic Tutor</span>
+        <span class="badge-active-provider" id="active-provider-badge">Active AI: Google Gemini</span>
+      </div>
+
+      <a href="profile.html" class="btn-settings" style="text-decoration: none;">
+        <i class="ri-user-settings-line" style="color: #a78bfa;"></i> Manage AI Keys in Profile
+      </a>
+    </header>
+
+    <!-- Chat Messages Window -->
+    <div class="chat-container" id="chat-container">
+      <!-- Welcome message loaded via tutor.js -->
+    </div>
+
+    <!-- Quick Suggestion Action Pills -->
+    <div class="suggestions-row">
+      <div class="suggestion-pill" onclick="sendMessage('What is your name?')">
+        🎯 What's your name?
+      </div>
+      <div class="suggestion-pill" onclick="sendMessage('Analyze my overall performance across assessments')">
+        📊 Analyze my assessment scores
+      </div>
+      <div class="suggestion-pill" onclick="sendMessage('Can you give me a 7-day study plan to improve?')">
+        📅 Generate 7-day study plan
+      </div>
+      <div class="suggestion-pill" onclick="sendMessage('Explain array out-of-bounds boundary errors in C/JavaScript')">
+        💻 Explain Array Out-of-Bounds
+      </div>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="input-area">
+      <input type="text" class="input-box" id="tutor-input" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Ask your Examate AI Tutor anything about your studies...">
+      <button class="btn-send" onclick="sendMessage()">
+        Send <i class="ri-send-plane-fill"></i>
+      </button>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="js/tutor.js"></script>
+</body>
+</html>
+
+

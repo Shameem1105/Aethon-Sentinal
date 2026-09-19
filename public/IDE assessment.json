@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Debug Interactive Counter Application",
+    "description": "# Problem Description\nInspect workspace files `index.html`, `style.css`, and `script.js` to locate two defects:\n1. Fix `increment()` in `script.js` so numbers increment mathematically instead of concatenating as strings.\n2. Fix the event listener typo in `script.js` for the decrement button (`clik` -> `click`).",
+    "starter_files": {
+      "index.html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Aethon Interactive Counter Debug Challenge</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <div class=\"counter-card\">\n    <h2>Interactive Counter App</h2>\n    <p>Click the buttons below to adjust the count score.</p>\n    \n    <div class=\"display-box\" id=\"countDisplay\">0</div>\n    \n    <div class=\"btn-group\">\n      <button id=\"decrementBtn\">- Decrease</button>\n      <button id=\"resetBtn\">Reset</button>\n      <button id=\"incrementBtn\">+ Increase</button>\n    </div>\n  </div>\n\n  <script src=\"script.js\"></script>\n</body>\n</html>",
+      "style.css": "body {\n  margin: 0;\n  padding: 0;\n  background-color: #0f172a;\n  color: #f8fafc;\n  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n}\n\n.counter-card {\n  background: #1e293b;\n  border: 1px solid rgba(255, 255, 255, 0.1);\n  border-radius: 16px;\n  padding: 32px;\n  text-align: center;\n  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);\n  width: 320px;\n}\n\n.counter-card h2 {\n  font-size: 20px;\n  margin-bottom: 8px;\n  color: #38bdf8;\n}\n\n.counter-card p {\n  font-size: 13px;\n  color: #94a3b8;\n  margin-bottom: 24px;\n}\n\n.display-box {\n  font-size: 48px;\n  font-weight: 700;\n  color: #34d399;\n  background: #0f172a;\n  padding: 16px;\n  border-radius: 12px;\n  margin-bottom: 24px;\n  border: 1px solid rgba(255, 255, 255, 0.05);\n}\n\n.btn-group {\n  display: flex;\n  gap: 8px;\n  justify-content: center;\n}\n\n.btn-group button {\n  flex: 1;\n  padding: 10px 14px;\n  border: none;\n  border-radius: 8px;\n  font-weight: 600;\n  cursor: pointer;\n  background: #3b82f6;\n  color: white;\n  transition: background 0.2s;\n}\n\n.btn-group button:hover {\n  background: #2563eb;\n}\n\n#resetBtn {\n  background: #64748b;\n}\n\n#resetBtn:hover {\n  background: #475569;\n}",
+      "script.js": "// Aethon IDE Debugging Challenge: Fix the Counter Bug\nlet count = 0;\n\nfunction updateDisplay() {\n  const displayEl = document.getElementById(\"countDisplay\");\n  if (displayEl) {\n    displayEl.textContent = count;\n  }\n}\n\n// BUG 1: String concatenation instead of integer addition (\"01\" instead of 1)\nfunction increment() {\n  count = count + \"1\"; // BUG: Should be integer 1, not string \"1\"\n  updateDisplay();\n}\n\nfunction decrement() {\n  count = parseInt(count) - 1;\n  updateDisplay();\n}\n\nfunction reset() {\n  count = 0;\n  updateDisplay();\n}\n\n// BUG 2: Typo in event listener event name (\"clik\" instead of \"click\")\ndocument.addEventListener(\"DOMContentLoaded\", () => {\n  const incBtn = document.getElementById(\"incrementBtn\");\n  const decBtn = document.getElementById(\"decrementBtn\");\n  const rstBtn = document.getElementById(\"resetBtn\");\n\n  if (incBtn) incBtn.addEventListener(\"click\", increment);\n  if (decBtn) decBtn.addEventListener(\"clik\", decrement); // BUG: Typo \"clik\" instead of \"click\"\n  if (rstBtn) rstBtn.addEventListener(\"click\", reset);\n});\n\nif (typeof module !== \"undefined\" && module.exports) {\n  module.exports = { increment, decrement, reset, getCount: () => count };\n}",
+      "README.md": "# Aethon IDE Debugging Challenge: Counter Application\n\n## Challenge Overview\nThe provided web application contains two bugs that prevent the counter from working properly:\n1. Clicking **+ Increase** causes the score to concatenate as strings (e.g., `0111`) instead of incrementing numerically (`1, 2, 3`).\n2. Clicking **- Decrease** fails to respond due to an event listener typo in `script.js`.\n\n## Task Instructions\n1. Inspect `script.js` in the workspace editor.\n2. Fix the string concatenation defect in `increment()` so `count` increments as a number.\n3. Fix the event listener event name typo in `document.getElementById(\"decrementBtn\").addEventListener(...)`.\n4. Test your solution and verify all test cases pass!"
+    },
+    "test_cases": [
+      {
+        "name": "Verify Increment Integer Addition",
+        "input": "increment() 3 times",
+        "expected": "count === 3 (number)",
+        "hidden": false
+      },
+      {
+        "name": "Verify Decrement Event Listener Fix",
+        "input": "decrement()",
+        "expected": "count === 2",
+        "hidden": false
+      },
+      {
+        "name": "Reset Counter to Zero",
+        "input": "reset()",
+        "expected": "count === 0",
+        "hidden": true
+      }
+    ]
+  }
+]

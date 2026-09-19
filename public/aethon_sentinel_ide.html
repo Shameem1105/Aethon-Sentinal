@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aethon IDE — Enterprise Assessment Platform</title>
+
+  <!-- Fonts: Inter Variable & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Icons & Bootstrap Grid -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- CodeMirror Editor -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+
+  <style>
+    :root {
+      /* Enterprise Design Tokens */
+      --bg-primary: #0B1120;
+      --surface-secondary: #111827;
+      --surface-elevated: #1E293B;
+      --surface-card: rgba(30, 41, 59, 0.6);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-medium: rgba(255, 255, 255, 0.14);
+
+      --accent-primary: #2563EB;
+      --accent-hover: #1D4ED8;
+      --accent-ai: #8B5CF6;
+      --accent-ai-light: rgba(139, 92, 246, 0.15);
+
+      --color-success: #22C55E;
+      --color-success-bg: rgba(34, 197, 94, 0.12);
+      --color-warning: #F59E0B;
+      --color-warning-bg: rgba(245, 158, 11, 0.12);
+      --color-danger: #EF4444;
+      --color-danger-bg: rgba(239, 68, 68, 0.12);
+
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body, html {
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    /* --------------------------------------------------
+       Top Navigation Bar
+    -------------------------------------------------- */
+    .top-nav {
+      height: 52px;
+      background: var(--surface-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: relative;
+      z-index: 50;
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 16px; }
+    .brand-logo {
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.02em;
+    }
+    .brand-icon {
+      width: 28px; height: 28px;
+      background: var(--accent-primary);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 14px;
+    }
+    .nav-divider { width: 1px; height: 18px; background: var(--border-subtle); }
+    .assessment-title-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .nav-center { display: flex; align-items: center; gap: 12px; }
+    .question-title-badge {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-diff {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+    }
+    .progress-dots { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-medium); }
+    .dot.active { background: var(--accent-primary); }
+
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .timer-pill {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: var(--color-warning);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .device-status { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 15px; }
+    .proctor-pill {
+      background: var(--color-success-bg);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      color: var(--color-success);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .status-dot-green { width: 6px; height: 6px; border-radius: 50%; background: var(--color-success); }
+    .user-avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: #334155;
+      color: white;
+      font-weight: 700;
+      font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* --------------------------------------------------
+       Main App Layout Grid
+    -------------------------------------------------- */
+    .app-workspace {
+      display: flex;
+      height: calc(100vh - 52px);
+      width: 100vw;
+    }
+
+    /* Activity Bar (Far Left Dock) */
+    .dock-bar {
+      width: 48px;
+      background: var(--surface-secondary);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+    }
+    .dock-top, .dock-bottom { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .dock-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .dock-icon:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.05); }
+    .dock-icon.active { color: var(--accent-primary); background: rgba(37, 99, 235, 0.12); }
+
+    /* Left Workspace Sidebar */
+    .sidebar-panel {
+      width: 240px;
+      background: var(--surface-secondary);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .panel-title { font-size: 13px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .panel-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    .file-search-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .file-input {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: var(--text-primary);
+      font-size: 12px;
+    }
+    .file-input:focus { outline: none; border-color: var(--accent-primary); }
+
+    .file-tree-container { flex: 1; padding: 12px 8px; overflow-y: auto; }
+    .tree-section-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 6px 8px;
+    }
+    .file-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+    }
+    .file-row:hover { background: rgba(255, 255, 255, 0.04); color: var(--text-primary); }
+    .file-row.active { background: rgba(37, 99, 235, 0.15); color: #60A5FA; font-weight: 600; }
+    .file-badge { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-left: auto; }
+
+    .sidebar-footer {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    /* --------------------------------------------------
+       Main Code Editor Area (Dominant Center)
+    -------------------------------------------------- */
+    .editor-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-primary);
+      position: relative;
+    }
+
+    .editor-tabs-bar {
+      height: 38px;
+      background: var(--surface-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      overflow-x: auto;
+    }
+    .tab-item {
+      padding: 0 14px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-right: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-item:hover { color: var(--text-primary); }
+    .tab-item.active {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-weight: 600;
+      border-top: 2px solid var(--accent-primary);
+    }
+    .tab-lang-tag { font-size: 10px; padding: 2px 5px; border-radius: 4px; background: rgba(255,255,255,0.06); color: var(--text-muted); }
+
+    .editor-status-line {
+      height: 26px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .cm-area-wrapper { flex: 1; position: relative; min-height: 0; overflow: hidden; }
+    .CodeMirror {
+      position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+      height: 100% !important;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      background: #0B1120 !important;
+      color: #E2E8F0 !important;
+    }
+    .CodeMirror-scroll {
+      max-height: 100% !important;
+      overflow-y: auto !important;
+      overflow-x: auto !important;
+    }
+
+    /* --------------------------------------------------
+       Bottom Execution Console & Action Bar
+    -------------------------------------------------- */
+    .console-panel {
+      height: 240px;
+      background: var(--surface-secondary);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+    }
+    .console-header-bar {
+      height: 48px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .console-title-group h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px; }
+    .console-sub { font-size: 12px; color: var(--text-muted); font-weight: 400; margin-left: 6px; }
+
+    .console-action-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-enterprise-primary {
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 18px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      transition: background 0.15s ease;
+    }
+    .btn-enterprise-primary:hover { background: var(--accent-hover); }
+
+    .btn-enterprise-secondary {
+      background: var(--surface-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: 18px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: background 0.15s ease;
+    }
+    .btn-enterprise-secondary:hover { background: rgba(255, 255, 255, 0.08); }
+
+    .btn-enterprise-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-enterprise-ghost:hover { color: var(--text-primary); border-color: var(--border-medium); }
+
+    .test-matrix-container {
+      flex: 1;
+      padding: 14px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .test-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      transition: border-color 0.15s ease;
+    }
+    .test-card:hover { border-color: var(--border-medium); }
+    .test-info { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+    .test-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+    .test-status-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .test-status-pill.passed { background: var(--color-success-bg); color: var(--color-success); }
+    .test-status-pill.failed { background: var(--color-danger-bg); color: var(--color-danger); }
+    .test-metrics { display: flex; align-items: center; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); }
+
+    /* --------------------------------------------------
+       Right Panel: Aethon Copilot
+    -------------------------------------------------- */
+    .copilot-panel {
+      width: 360px;
+      background: var(--surface-secondary);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .copilot-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .copilot-title-group h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .copilot-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .ai-chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--accent-ai-light);
+      color: var(--accent-ai);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .copilot-body {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Enterprise Panel Card Blocks */
+    .copilot-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .copilot-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .btn-hint-use {
+      width: 100%;
+      background: rgba(139, 92, 246, 0.12);
+      color: var(--accent-ai);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background 0.15s ease;
+    }
+    .btn-hint-use:hover { background: rgba(139, 92, 246, 0.2); }
+
+    .hint-bar { height: 4px; background: var(--surface-elevated); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+    .hint-fill { height: 100%; width: 66%; background: var(--accent-ai); transition: width 0.3s; }
+
+    .learning-list { list-style: none; margin: 0; padding: 0; }
+    .learning-list li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .learning-list li::before { content: "•"; color: var(--accent-ai); }
+
+    /* Conversation Stream */
+    .chat-stream { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .chat-msg-bubble {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      user-select: text;
+    }
+    .chat-msg-bubble.user {
+      background: var(--accent-primary);
+      color: white;
+      align-self: flex-end;
+      max-width: 85%;
+    }
+    .chat-msg-bubble.agent {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      align-self: flex-start;
+      max-width: 95%;
+    }
+
+    /* Copilot Input Footer & Send Button */
+    .copilot-input-area {
+      padding: 14px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--surface-secondary);
+    }
+    .confidence-meter {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    
+    .copilot-input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .copilot-textarea {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      resize: none;
+    }
+    .copilot-textarea:focus { outline: none; border-color: var(--accent-ai); }
+
+    .btn-ai-send {
+      align-self: flex-end;
+      background: var(--accent-ai);
+      color: white;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+    }
+    .btn-ai-send:hover { background: #7C3AED; }
+
+    /* Security Violation Modal Overlay */
+    .security-modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(11, 17, 32, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center; justify-content: center;
+    }
+    .security-modal-card {
+      background: #1e293b;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(239, 68, 68, 0.2);
+      border-radius: 16px;
+      width: 460px;
+      max-width: 90vw;
+      padding: 24px;
+      text-align: center;
+      color: #f8fafc;
+    }
+    .security-icon-circle {
+      width: 56px; height: 56px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 50%;
+      color: #ef4444;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 16px auto;
+    }
+    .security-modal-title { font-size: 18px; font-weight: 700; color: #ef4444; margin-bottom: 8px; }
+    .security-modal-desc { font-size: 14px; color: #94a3b8; line-height: 1.5; margin-bottom: 20px; }
+    .security-count-badge {
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    /* Webcam Floating PIP Feed */
+    .webcam-proctor-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 150px;
+      height: 110px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--accent-primary);
+      background: #000;
+      z-index: 1000;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      display: none;
+    }
+    .webcam-proctor-video {
+      width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);
+    }
+    .webcam-live-indicator {
+      position: absolute; top: 6px; left: 6px;
+      background: rgba(34, 197, 94, 0.85);
+      color: white; font-size: 9px; font-weight: 700;
+      padding: 2px 6px; border-radius: 10px;
+      display: flex; align-items: center; gap: 4px;
+      backdrop-filter: blur(4px);
+    }
+    .webcam-live-dot { width: 5px; height: 5px; border-radius: 50%; background: white; animation: pulseDot 1.5s infinite; }
+    @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <div class="top-nav">
+    <div class="nav-left">
+      <div class="brand-logo">
+        <div class="brand-icon"><i class="ri-code-s-slash-line"></i></div>
+        Aethon
+      </div>
+      <div class="nav-divider"></div>
+      <div class="assessment-title-label">Senior Backend Engineer — Round 2</div>
+    </div>
+
+    <div class="nav-center">
+      <div class="question-title-badge" id="questionTitleDisplay">
+        Two Sum
+        <span class="badge-diff">Easy</span>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="progress-dots">
+        <span class="dot active"></span>
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span style="margin-left:4px;">2/5</span>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <button class="btn-enterprise-ghost" onclick="toggleExamFullscreen()" title="Toggle Fullscreen Exam Mode" style="border-radius: 20px; font-weight: 600;">
+        <i class="ri-fullscreen-line"></i> Fullscreen
+      </button>
+      <div class="timer-pill">
+        <i class="ri-time-line"></i> <span id="timerDisplay">35:53</span>
+      </div>
+      <div class="device-status">
+        <i class="ri-video-line text-secondary" id="camStatusIcon"></i>
+        <i class="ri-mic-line text-secondary"></i>
+      </div>
+      <div class="proctor-pill" id="proctorPillStatus">
+        <span class="status-dot-green" id="proctorStatusDot"></span> <span id="proctorPillText">Proctored</span>
+      </div>
+      <div class="user-avatar" title="Candidate Profile">JD</div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN WORKSPACE LAYOUT ================= -->
+  <div class="app-workspace">
+
+    <!-- Far Left Icon Dock -->
+    <div class="dock-bar">
+      <div class="dock-top">
+        <div class="dock-icon active" title="Explorer"><i class="ri-file-text-line"></i></div>
+        <div class="dock-icon" title="Search"><i class="ri-search-line"></i></div>
+        <div class="dock-icon" title="Terminal"><i class="ri-terminal-box-line"></i></div>
+      </div>
+      <div class="dock-bottom">
+        <div class="dock-icon" title="Settings"><i class="ri-settings-4-line"></i></div>
+        <div class="dock-icon" title="Collapse Sidebar"><i class="ri-side-bar-line"></i></div>
+      </div>
+    </div>
+
+    <!-- Left Workspace Sidebar -->
+    <div class="sidebar-panel">
+      <div class="panel-header">
+        <div class="panel-title">WORKSPACE</div>
+        <div class="panel-sub">Manage your assessment files.</div>
+      </div>
+
+      <div class="file-search-box">
+        <input type="text" class="file-input" placeholder="Search files..." id="fileSearchInput" onkeyup="filterFileTree()">
+      </div>
+
+      <div class="file-tree-container">
+        <div class="tree-section-header">WORKSPACE</div>
+        <div class="file-tree" id="fileTree">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span><i class="ri-git-branch-line me-1"></i> main</span>
+        <span>1 uncommitted change</span>
+      </div>
+    </div>
+
+    <!-- Main Code Editor Workspace -->
+    <div class="editor-container">
+      
+      <!-- Editor Tab Bar -->
+      <div class="editor-tabs-bar" id="tabBar">
+        <div class="tab-item active">
+          <i class="ri-code-s-slash-line text-warning"></i>
+          <span id="tabFileName">solution.py</span>
+          <span class="tab-lang-tag" id="tabLangTag">PY</span>
+        </div>
+      </div>
+
+      <!-- Editor Status Info Line -->
+      <div class="editor-status-line">
+        <div>Ln 9, Col 1 &nbsp;|&nbsp; Python 3.11 &nbsp;|&nbsp; UTF-8 &nbsp;|&nbsp; 4 spaces</div>
+        <div># 23 lines &nbsp;|&nbsp; • Saved</div>
+      </div>
+
+      <!-- CodeMirror Text Area -->
+      <div class="cm-area-wrapper">
+        <textarea id="codeEditor"></textarea>
+      </div>
+
+      <!-- Execution Console Panel -->
+      <div class="console-panel">
+        <div class="console-header-bar">
+          <div class="console-title-group">
+            <h4>
+              <i class="ri-terminal-box-line text-secondary"></i>
+              Execution Console
+              <span class="console-sub">Compilation logs and runtime output.</span>
+            </h4>
+          </div>
+
+          <div class="console-action-buttons">
+            <button class="btn-enterprise-ghost" onclick="resetCode()"><i class="ri-refresh-line"></i> Reset Code</button>
+            <button class="btn-enterprise-secondary" onclick="runTests()"><i class="ri-play-fill"></i> Run Test Cases</button>
+            <button class="btn-enterprise-primary" onclick="submitAssessment()"><i class="ri-flashlight-fill"></i> Submit Assessment</button>
+          </div>
+        </div>
+
+        <div class="test-matrix-container" id="consoleOutput">
+          <!-- Dynamic Test Cards Rendered Here -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Copilot Panel: Aethon Copilot -->
+    <div class="copilot-panel">
+      <div class="copilot-header">
+        <div class="copilot-title-group">
+          <h3>
+            <i class="ri-sparkling-fill" style="color: var(--accent-ai);"></i>
+            Aethon Copilot
+            <span class="ai-chip">AI</span>
+          </h3>
+          <div class="copilot-sub">AI assistance for your assessment.</div>
+        </div>
+      </div>
+
+      <div class="copilot-body">
+        
+        <!-- Hints Card -->
+        <div class="copilot-card">
+          <div class="copilot-card-title">
+            <span><i class="ri-lightbulb-line me-1" style="color: var(--accent-ai);"></i> Hints Remaining</span>
+            <span style="font-family: monospace;" id="hintRatioLabel">2 / 3</span>
+          </div>
+          <div class="hint-bar"><div class="hint-fill" id="hintProgressFill"></div></div>
+          <button class="btn-hint-use" onclick="useHint()">Use a Hint</button>
+        </div>
+
+        <!-- Current Compiler Error Card -->
+        <div class="copilot-card">
+          <div class="copilot-card-title" style="color: var(--color-danger);">
+            <span><i class="ri-error-warning-line me-1"></i> Current Compiler Error</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted);" id="compilerErrorStatus">No errors detected</div>
+        </div>
+
+        <!-- Suggested Learning Topics Card -->
+        <div class="copilot-card">
+          <div class="copilot-card-title">
+            <span><i class="ri-book-read-line me-1"></i> Suggested Learning Topics</span>
+          </div>
+          <ul class="learning-list">
+            <li>Hash Maps &amp; Dictionaries</li>
+            <li>Two-pointer technique</li>
+            <li>Time complexity analysis</li>
+          </ul>
+        </div>
+
+        <!-- Conversation Stream -->
+        <div class="chat-stream" id="chatTranscript">
+          <div class="chat-msg-bubble agent">
+            Hello! I'm <strong>Aethon Copilot</strong>. I can help you work through this problem. What would you like to explore?
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Copilot Input Area with Send Button -->
+      <div class="copilot-input-area">
+        <div class="confidence-meter">
+          <span>AI Confidence</span>
+          <span style="color: var(--color-success); font-weight: 600;">94%</span>
+        </div>
+        <div class="copilot-input-wrapper">
+          <textarea class="copilot-textarea" id="agentInput" rows="2" placeholder="Ask Aethon Copilot (Press Enter to send)..." onkeydown="handleAiInputKey(event)"></textarea>
+          <button class="btn-ai-send" onclick="sendAgentQuery()" title="Send Question to AI Copilot">
+            <i class="ri-send-plane-fill"></i> Ask AI
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Start Exam Fullscreen Welcome Modal -->
+  <div class="security-modal-overlay" id="startExamModal" style="display: flex;">
+    <div class="security-modal-card" style="border-color: rgba(56, 189, 248, 0.5); width: 500px;">
+      <div class="security-icon-circle" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+        <i class="ri-shield-check-line"></i>
+      </div>
+      <h3 class="security-modal-title" style="color: #38bdf8; font-size: 20px;">Aethon Sentinel Proctored Environment</h3>
+      <p class="security-modal-desc" style="margin-top: 10px;">
+        Security proctoring is enabled for this assessment session:
+      </p>
+      <div style="text-align: left; background: rgba(15, 23, 42, 0.6); padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+        <div><i class="ri-fullscreen-line me-2" style="color:#38bdf8;"></i> Fullscreen Exam Mode</div>
+        <div><i class="ri-lock-line me-2" style="color:#f87171;"></i> Tab Switch & Window Focus Monitor</div>
+        <div><i class="ri-file-copy-line me-2" style="color:#f59e0b;"></i> Copy / Paste Protection</div>
+        <div><i class="ri-brain-line me-2" style="color:#34d399;"></i> Socratic Copilot Debugging Hints</div>
+      </div>
+      <button class="btn-enterprise-primary" style="width: 100%; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 12px; cursor: pointer; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border: none;" onclick="beginAssessmentFullscreen()">
+        🚀 Enter Fullscreen & Begin Assessment
+      </button>
+    </div>
+  </div>
+
+  <!-- Security Violation Warning Modal -->
+  <div class="security-modal-overlay" id="securityModal">
+    <div class="security-modal-card">
+      <div class="security-icon-circle">
+        <i class="ri-error-warning-line"></i>
+      </div>
+      <h3 class="security-modal-title">Security Violation Detected</h3>
+      <p class="security-modal-desc" id="secModalMessage">Switching tabs or leaving the exam environment is prohibited.</p>
+      <div class="security-count-badge" id="secViolationBadge">Violation Count: 1 / 3</div>
+      <div>
+        <button class="btn-enterprise-primary" id="secModalBtn" style="width: 100%; padding: 12px; font-weight: 600; border-radius: 10px; background: #ef4444; color: white; border: none; cursor: pointer;" onclick="acknowledgeSecurityViolation()">
+          Acknowledge & Return to Assessment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Confirmation Modal Overlay -->
+  <div class="security-modal-overlay" id="submitConfirmModal">
+    <div class="security-modal-card" style="border-color: rgba(37, 99, 235, 0.5); width: 480px;">
+      <div class="security-icon-circle" style="background: rgba(37, 99, 235, 0.15); color: #3b82f6;">
+        <i class="ri-checkbox-circle-line"></i>
+      </div>
+      <h3 class="security-modal-title" style="color: #3b82f6; font-size: 20px;">Submit Assessment</h3>
+      <p class="security-modal-desc" style="margin-top: 10px; margin-bottom: 20px; font-size: 14px; color: #cbd5e1; line-height: 1.5;">
+        Are you sure you want to submit your final assessment solution? Once submitted, your answers will be recorded and your session will end.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button style="flex: 1; padding: 12px; font-weight: 600; border-radius: 10px; background: transparent; border: 1px solid var(--border-medium); color: #cbd5e1; cursor: pointer;" onclick="closeSubmitConfirmModal()">
+          Cancel
+        </button>
+        <button style="flex: 1; padding: 12px; font-weight: 600; border-radius: 10px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);" onclick="confirmFinalSubmission()">
+          Confirm Submission
+        </button>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/markdown/markdown.min.js"></script>
+
+  <script>
+    let defaultStarterFiles = {
+      "index.html": "<!DOCTYPE html>\n<html>\n<head>\n<title>Aethon Challenge</title>\n</head>\n<body>\n<h1>Aethon AI Challenge</h1>\n</body>\n</html>",
+      "script.js": "// Starter JavaScript\nfunction solve() {\n  console.log('Solve challenge');\n}",
+      "style.css": "/* App Styling */\nbody {\n  background: #0f172a;\n  color: #fff;\n}",
+      "README.md": "# Aethon Debugging Challenge\n\nInspect workspace files and fix the code defects."
+    };
+
+    let filesState = Object.assign({}, defaultStarterFiles);
+    let questionId = 1;
+    let testId = 1;
+    let activeFileName = 'index.html';
+    let hintsCount = 1;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('id')) testId = urlParams.get('id');
+
+    // Initialize CodeMirror Editor
+    const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+      lineNumbers: true,
+      theme: 'dracula',
+      mode: 'javascript',
+      tabSize: 2,
+      indentWithTabs: false
+    });
+
+    // Initial render
+    renderFileTree();
+    openFile(Object.keys(filesState)[0] || 'index.html', true);
+    renderInitialTestCards();
+
+    // Fetch Question Data from Backend API
+    fetch(`/api/aethon/get-question/${testId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.question) {
+          questionId = data.question.id || 1;
+          if (data.question.title) {
+            const displayEl = document.getElementById('questionTitleDisplay');
+            if (displayEl) displayEl.childNodes[0].nodeValue = data.question.title + ' ';
+          }
+          try {
+            const parsed = typeof data.question.starter_files === 'string' ? JSON.parse(data.question.starter_files) : data.question.starter_files;
+            if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+              filesState = parsed;
+            }
+          } catch(e) {
+            console.error("Error parsing starter_files:", e);
+          }
+          renderFileTree();
+          activeFileName = Object.keys(filesState)[0] || 'index.html';
+          openFile(activeFileName, true);
+        }
+      })
+      .catch(err => console.error("Fetch question error:", err));
+
+    function renderFileTree() {
+      const treeEl = document.getElementById('fileTree');
+      treeEl.innerHTML = '';
+      Object.keys(filesState).forEach(filename => {
+        const item = document.createElement('div');
+        item.className = 'file-row' + (filename === activeFileName ? ' active' : '');
+        item.onclick = () => openFile(filename);
+        
+        let ext = filename.split('.').pop().toUpperCase();
+        let iconClass = 'ri-file-text-line text-secondary';
+        if (filename.endsWith('.html') || filename.endsWith('.htm')) iconClass = 'ri-html5-line text-danger';
+        else if (filename.endsWith('.css')) iconClass = 'ri-css3-line text-info';
+        else if (filename.endsWith('.js')) iconClass = 'ri-code-s-slash-line text-warning';
+        else if (filename.endsWith('.py')) iconClass = 'ri-code-s-slash-line text-success';
+        else if (filename.endsWith('.md')) iconClass = 'ri-markdown-line text-primary';
+        
+        item.innerHTML = `<i class="${iconClass}"></i><span>${filename}</span><span class="file-badge">${ext}</span>`;
+        treeEl.appendChild(item);
+      });
+    }
+
+    function openFile(filename, isInitial = false) {
+      if (filesState[filename] === undefined) return;
+
+      if (!isInitial && activeFileName && filesState[activeFileName] !== undefined && editor.getValue()) {
+        filesState[activeFileName] = editor.getValue();
+      }
+
+      activeFileName = filename;
+      document.getElementById('tabFileName').innerText = filename;
+      document.getElementById('tabLangTag').innerText = filename.split('.').pop().toUpperCase();
+      
+      let mode = 'javascript';
+      if (filename.endsWith('.py')) mode = 'python';
+      else if (filename.endsWith('.html') || filename.endsWith('.htm')) mode = 'htmlmixed';
+      else if (filename.endsWith('.css')) mode = 'css';
+      else if (filename.endsWith('.md')) mode = 'markdown';
+
+      editor.setOption('mode', mode);
+      editor.setValue(filesState[filename] || '');
+
+      setTimeout(() => editor.refresh(), 50);
+
+      document.querySelectorAll('.file-row').forEach(el => {
+        const spanText = el.querySelector('span');
+        el.classList.toggle('active', spanText && spanText.innerText.trim() === filename);
+      });
+    }
+
+    function renderInitialTestCards() {
+      const container = document.getElementById('consoleOutput');
+      container.innerHTML = `
+        <div class="test-card">
+          <div class="test-info">
+            <span class="test-id">01</span>
+            <i class="ri-checkbox-circle-fill text-success"></i>
+            <span>Example Test 1 — nums=[2,7,11,15], target=9</span>
+          </div>
+          <div class="test-metrics">
+            <span class="test-status-pill passed">Passed</span>
+            <span><i class="ri-time-line"></i> 2 ms</span>
+            <span><i class="ri-database-2-line"></i> 14.2 MB</span>
+          </div>
+        </div>
+        <div class="test-card">
+          <div class="test-info">
+            <span class="test-id">02</span>
+            <i class="ri-checkbox-circle-fill text-success"></i>
+            <span>Example Test 2 — nums=[3,2,4], target=6</span>
+          </div>
+          <div class="test-metrics">
+            <span class="test-status-pill passed">Passed</span>
+            <span><i class="ri-time-line"></i> 1 ms</span>
+            <span><i class="ri-database-2-line"></i> 13.8 MB</span>
+          </div>
+        </div>
+        <div class="test-card">
+          <div class="test-info">
+            <span class="test-id">03</span>
+            <i class="ri-checkbox-circle-fill text-success"></i>
+            <span>Example Test 3 — nums=[3,3], target=6</span>
+          </div>
+          <div class="test-metrics">
+            <span class="test-status-pill passed">Passed</span>
+            <span><i class="ri-time-line"></i> 1 ms</span>
+            <span><i class="ri-database-2-line"></i> 13.9 MB</span>
+          </div>
+        </div>
+        <div class="test-card">
+          <div class="test-info">
+            <span class="test-id">04</span>
+            <i class="ri-close-circle-fill text-danger"></i>
+            <span>Edge Case — Empty array, target=0</span>
+          </div>
+          <div class="test-metrics">
+            <span class="test-status-pill failed">Failed</span>
+            <span><i class="ri-time-line"></i> 8 ms</span>
+            <span><i class="ri-database-2-line"></i> 13.5 MB</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function runTests() {
+      filesState[activeFileName] = editor.getValue();
+      const container = document.getElementById('consoleOutput');
+      container.innerHTML = `<div style="padding: 12px; font-family: monospace; font-size: 13px; color: #38bdf8;"><i class="ri-loader-4-line me-2"></i> Compiling and running test suite against workspace code...</div>`;
+
+      fetch('/api/aethon/run-tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question_id: questionId,
+          action: 'run',
+          files: filesState
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const scoreBadge = document.getElementById('testScoreBadge');
+          if (scoreBadge) {
+            scoreBadge.className = data.passed_tests === data.total_tests ? 'badge bg-success-subtle text-success' : 'badge bg-warning-subtle text-warning';
+            scoreBadge.innerText = `● ${data.passed_tests} / ${data.total_tests} passed (${data.score} Marks)`;
+          }
+
+          if (data.test_details && data.test_details.length > 0) {
+            container.innerHTML = data.test_details.map((tc, idx) => `
+              <div class="test-card">
+                <div class="test-info">
+                  <span class="test-id">${String(idx + 1).padStart(2, '0')}</span>
+                  <i class="${tc.passed ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-danger'}"></i>
+                  <span>${escapeHtml(tc.name)}</span>
+                </div>
+                <div class="test-metrics">
+                  <span class="test-status-pill ${tc.passed ? 'passed' : 'failed'}">${tc.passed ? 'Passed' : 'Failed'}</span>
+                  <span><i class="ri-time-line"></i> ${Math.floor(Math.random() * 3 + 1)} ms</span>
+                  <span><i class="ri-database-2-line"></i> 14.1 MB</span>
+                </div>
+              </div>
+            `).join('');
+          } else {
+            container.innerHTML = `<pre style="font-size:13px; color:#cbd5e1; white-space:pre-wrap;">${escapeHtml(data.console_output)}</pre>`;
+          }
+        }
+      })
+      .catch(err => {
+        container.innerHTML = `<div style="color: #ef4444; font-size:13px; padding:10px;">Execution failed: ${err.message}</div>`;
+      });
+    }
+
+    function submitAssessment() {
+      filesState[activeFileName] = editor.getValue();
+      const modal = document.getElementById("submitConfirmModal");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function closeSubmitConfirmModal() {
+      const modal = document.getElementById("submitConfirmModal");
+      if (modal) modal.style.display = "none";
+    }
+
+    function confirmFinalSubmission() {
+      const modal = document.getElementById("submitConfirmModal");
+      if (modal) {
+        modal.innerHTML = `
+          <div class="security-modal-card" style="border-color: rgba(34, 197, 94, 0.5); width: 440px;">
+            <div class="security-icon-circle" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">
+              <i class="ri-loader-4-line" style="animation: spin 1s infinite linear;"></i>
+            </div>
+            <h3 class="security-modal-title" style="color: #22c55e;">Submitting Assessment...</h3>
+            <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Finalizing your code solution and recording session logs.</p>
+          </div>
+        `;
+      }
+
+      if (testId) {
+        localStorage.setItem("submitted_test_" + testId, "true");
+      }
+
+      fetch('/api/aethon/run-tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question_id: questionId, test_id: testId, assessment_id: testId, student_email: userEmail, action: 'submit', files: filesState })
+      })
+      .then(res => res.json())
+      .then(() => {
+        if (modal) {
+          modal.innerHTML = `
+            <div class="security-modal-card" style="border-color: rgba(34, 197, 94, 0.5); width: 440px;">
+              <div class="security-icon-circle" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">
+                <i class="ri-checkbox-circle-fill"></i>
+              </div>
+              <h3 class="security-modal-title" style="color: #22c55e; font-size: 20px;">Assessment Submitted Successfully!</h3>
+              <p style="font-size: 14px; color: #cbd5e1; margin-top: 10px; margin-bottom: 20px;">
+                Your assessment has been submitted. Redirecting to your dashboard...
+              </p>
+            </div>
+          `;
+        }
+        setTimeout(() => {
+          window.location.href = 'ai-assessments.html';
+        }, 1800);
+      })
+      .catch(err => {
+        console.error("Submission error:", err);
+        window.location.href = 'ai-assessments.html';
+      });
+    }
+
+    function resetCode() {
+      if (confirm("Reset current file code to initial template state?")) {
+        if (defaultStarterFiles[activeFileName]) {
+          filesState[activeFileName] = defaultStarterFiles[activeFileName];
+          editor.setValue(filesState[activeFileName]);
+        }
+      }
+    }
+
+    function useHint() {
+      if (hintsCount >= 3) {
+        alert("Maximum hints (3/3) already used for this assessment.");
+        return;
+      }
+      hintsCount++;
+      document.getElementById('hintRatioLabel').innerText = `${hintsCount} / 3`;
+      document.getElementById('hintProgressFill').style.width = `${(hintsCount / 3) * 100}%`;
+      sendAgentQuery("Can you give me a hint regarding the current code defect?");
+    }
+
+    function handleAiInputKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendAgentQuery();
+      }
+    }
+
+    function sendAgentQuery(overridePrompt = null) {
+      const inputEl = document.getElementById('agentInput');
+      const prompt = overridePrompt || inputEl.value.trim();
+      if (!prompt) return;
+
+      filesState[activeFileName] = editor.getValue();
+      const transcript = document.getElementById('chatTranscript');
+      
+      const userDiv = document.createElement('div');
+      userDiv.className = 'chat-msg-bubble user';
+      userDiv.innerText = prompt;
+      transcript.appendChild(userDiv);
+
+      if (!overridePrompt) inputEl.value = '';
+
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'chat-msg-bubble agent';
+      typingDiv.innerText = '... Thinking ...';
+      transcript.appendChild(typingDiv);
+      transcript.scrollTop = transcript.scrollHeight;
+
+      fetch('/api/aethon/ai-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question_id: questionId,
+          prompt: prompt,
+          current_code: editor.getValue(),
+          error_log: document.getElementById('consoleOutput').innerText
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        transcript.removeChild(typingDiv);
+        const agentDiv = document.createElement('div');
+        agentDiv.className = 'chat-msg-bubble agent';
+        agentDiv.innerHTML = data.hint ? data.hint.replace(/\n/g, '<br>') : "Here is a Socratic hint for your code.";
+        transcript.appendChild(agentDiv);
+        transcript.scrollTop = transcript.scrollHeight;
+      })
+      .catch(err => {
+        transcript.removeChild(typingDiv);
+        const agentDiv = document.createElement('div');
+        agentDiv.className = 'chat-msg-bubble agent';
+        agentDiv.innerText = "Consider checking your variable boundary bounds and loop conditions.";
+        transcript.appendChild(agentDiv);
+      });
+    }
+
+    function filterFileTree() {
+      const query = document.getElementById('fileSearchInput').value.toLowerCase();
+      document.querySelectorAll('.file-row').forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(query) ? 'flex' : 'none';
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    let totalSecs = 35 * 60 + 53;
+    setInterval(() => {
+      if (totalSecs <= 0) return;
+      totalSecs--;
+      const m = String(Math.floor(totalSecs / 60)).padStart(2, '0');
+      const s = String(totalSecs % 60).padStart(2, '0');
+      document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+    }, 1000);
+
+    // ==========================================
+    // IN-BROWSER SECURITY & PROCTORING PROTOCOLS
+    // ==========================================
+    let violationCount = 0;
+    let maxViolations = 3;
+    let securityControls = {
+      tab_switch: 1,
+      copy_paste_block: 1,
+      fullscreen: 1,
+      hover_detection: 1,
+      webcam: 0,
+      tab_limit: 3
+    };
+    let isViolationCooldown = false;
+
+    const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail") || "student@aethon.edu";
+
+    // Fetch Exam Security Controls for testId
+    fetch(`/assessment/${testId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.controls) {
+          securityControls = Object.assign(securityControls, data.controls);
+          if (data.controls.tab_limit) maxViolations = parseInt(data.controls.tab_limit);
+        }
+        initSecurityEnforcement();
+      })
+      .catch(err => {
+        console.warn("Could not fetch server exam controls, applying default strict security protocols:", err);
+        initSecurityEnforcement();
+      });
+
+    function initSecurityEnforcement() {
+      updateProctorBadge("Sentinel Active", "green", 0);
+
+      // 1. Tab Switch & Window Focus Loss Detection
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && securityControls.tab_switch) {
+          handleSecurityViolation("Tab Switch / Tab Hidden Detected");
+        }
+      });
+
+      let windowBlurTimeout = null;
+      window.addEventListener("blur", () => {
+        if (securityControls.tab_switch && !document.hidden) {
+          windowBlurTimeout = setTimeout(() => {
+            handleSecurityViolation("Window Focus Lost / App Switched");
+          }, 300);
+        }
+      });
+
+      window.addEventListener("focus", () => {
+        if (windowBlurTimeout) clearTimeout(windowBlurTimeout);
+      });
+
+      // 2. Copy/Paste & Context Menu Blocking
+      if (securityControls.copy_paste_block) {
+        document.addEventListener("copy", (e) => {
+          e.preventDefault();
+          handleSecurityViolation("Copy Event Intercepted");
+        });
+        document.addEventListener("paste", (e) => {
+          e.preventDefault();
+          handleSecurityViolation("Paste Event Intercepted");
+        });
+        document.addEventListener("cut", (e) => {
+          e.preventDefault();
+          handleSecurityViolation("Cut Event Intercepted");
+        });
+        document.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          showSecurityNotification("Right-click context menu is disabled for exam security.");
+        });
+      }
+
+      // 3. DevTools / Inspection Keyboard Shortcuts Block
+      window.addEventListener("keydown", (e) => {
+        if (
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c")) ||
+          (e.ctrlKey && (e.key === "U" || e.key === "u"))
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          handleSecurityViolation("DevTools / Forbidden Shortcut Key Blocked");
+        }
+      });
+
+      // 4. Fullscreen Mode Detection
+      if (securityControls.fullscreen) {
+        document.addEventListener("fullscreenchange", () => {
+          if (!document.fullscreenElement) {
+            handleSecurityViolation("Exited Fullscreen Exam Mode");
+          }
+        });
+      }
+
+      // 5. Pure In-Browser Webcam Stream (if enabled)
+      if (securityControls.webcam) {
+        initWebcamFeed();
+      }
+    }
+
+    function initWebcamFeed() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            const video = document.getElementById("proctorWebcamFeed");
+            const container = document.getElementById("webcamProctorWidget");
+            const icon = document.getElementById("camStatusIcon");
+            if (video && container) {
+              video.srcObject = stream;
+              container.style.display = "block";
+            }
+            if (icon) {
+              icon.className = "ri-video-line text-success";
+            }
+          })
+          .catch(err => console.warn("Proctor webcam initialization failed:", err));
+      }
+    }
+
+    function handleSecurityViolation(violationType) {
+      if (isViolationCooldown) return;
+      isViolationCooldown = true;
+      setTimeout(() => { isViolationCooldown = false; }, 2000);
+
+      violationCount++;
+      
+      // Send real-time violation log to server endpoint for Admin dashboard monitoring
+      fetch("/proctor/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assessment_id: testId || 1,
+          student_email: userEmail,
+          log_type: `[Sentinel IDE] ${violationType} (Violation ${violationCount}/${maxViolations})`
+        })
+      }).catch(err => console.error("Error logging violation:", err));
+
+      updateProctorBadge(`Violations: ${violationCount}/${maxViolations}`, "red", violationCount);
+
+      const modal = document.getElementById("securityModal");
+      const msgEl = document.getElementById("secModalMessage");
+      const badgeEl = document.getElementById("secViolationBadge");
+      const btnEl = document.getElementById("secModalBtn");
+
+      if (modal && msgEl && badgeEl) {
+        msgEl.innerText = `${violationType}. Switching tabs, opening inspect tools, or leaving the exam environment is prohibited.`;
+        badgeEl.innerText = `Violation Count: ${violationCount} / ${maxViolations}`;
+        
+        if (violationCount >= maxViolations) {
+          msgEl.innerText = `Maximum allowable security violations reached (${violationCount}/${maxViolations}). Your assessment is being automatically submitted for review.`;
+          badgeEl.innerText = `CRITICAL: Assessment Terminated`;
+          btnEl.innerText = "Submitting Assessment...";
+          btnEl.onclick = null;
+          setTimeout(() => {
+            submitAssessmentAuto();
+          }, 3000);
+        } else {
+          btnEl.innerText = "Acknowledge & Return to Assessment";
+          btnEl.onclick = acknowledgeSecurityViolation;
+        }
+        modal.style.display = "flex";
+      }
+    }
+
+    function beginAssessmentFullscreen() {
+      const modal = document.getElementById("startExamModal");
+      if (modal) modal.style.display = "none";
+
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(err => console.warn(err));
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+      }
+    }
+
+    function toggleExamFullscreen() {
+      if (!document.fullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(err => console.warn(err));
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(err => console.warn(err));
+        }
+      }
+    }
+
+    function acknowledgeSecurityViolation() {
+      const modal = document.getElementById("securityModal");
+      if (modal) modal.style.display = "none";
+      if (securityControls.fullscreen && !document.fullscreenElement) {
+        toggleExamFullscreen();
+      }
+    }
+
+    function showSecurityNotification(text) {
+      const container = document.getElementById('consoleOutput');
+      if (container) {
+        const alertDiv = document.createElement('div');
+        alertDiv.style.cssText = "background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;";
+        alertDiv.innerHTML = `<i class="ri-shield-cross-line me-2"></i> ${text}`;
+        container.prepend(alertDiv);
+      }
+    }
+
+    function updateProctorBadge(text, color, count) {
+      const pillText = document.getElementById("proctorPillText");
+      const statusDot = document.getElementById("proctorStatusDot");
+      const pillContainer = document.getElementById("proctorPillStatus");
+
+      if (pillText) pillText.innerText = text;
+      if (statusDot && pillContainer) {
+        if (color === "red") {
+          statusDot.className = "";
+          statusDot.style.cssText = "width: 6px; height: 6px; border-radius: 50%; background: #ef4444; display: inline-block;";
+          pillContainer.style.background = "rgba(239, 68, 68, 0.15)";
+          pillContainer.style.borderColor = "rgba(239, 68, 68, 0.3)";
+          pillContainer.style.color = "#ef4444";
+        } else {
+          statusDot.className = "status-dot-green";
+          pillContainer.style.background = "var(--color-success-bg)";
+          pillContainer.style.borderColor = "rgba(34, 197, 94, 0.25)";
+          pillContainer.style.color = "var(--color-success)";
+        }
+      }
+    }
+
+    function toggleExamFullscreen() {
+      const docEl = document.documentElement;
+      if (!document.fullscreenElement) {
+        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    function submitAssessmentAuto() {
+      filesState[activeFileName] = editor.getValue();
+      fetch('/api/aethon/run-tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question_id: questionId, action: 'submit', files: filesState, student_email: userEmail })
+      })
+      .then(() => {
+        window.location.href = 'submitted.html?id=' + testId;
+      })
+      .catch(() => {
+        window.location.href = 'dashboard.html';
+      });
+    }
+  </script>
+
+  <!-- Security Violation Modal -->
+  <div class="security-modal-overlay" id="securityModal">
+    <div class="security-modal-card">
+      <div class="security-icon-circle">
+        <i class="ri-shield-keyhole-line"></i>
+      </div>
+      <div class="security-modal-title" id="secModalTitle">Security Violation Detected</div>
+      <div class="security-modal-desc" id="secModalMessage">
+        Switching tabs, leaving the window, or using unauthorized shortcuts is prohibited during this assessment.
+      </div>
+      <div class="security-count-badge" id="secViolationBadge">
+        Violation Count: 1 / 3
+      </div>
+      <div>
+        <button class="btn-enterprise-primary" style="width: 100%; justify-content: center;" onclick="acknowledgeSecurityViolation()" id="secModalBtn">
+          Acknowledge & Return to Assessment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- In-Browser Webcam PIP Feed -->
+  <div class="webcam-proctor-container" id="webcamProctorWidget">
+    <video id="proctorWebcamFeed" class="webcam-proctor-video" autoplay playsinline muted></video>
+    <div class="webcam-live-indicator">
+      <span class="webcam-live-dot"></span> LIVE PROCTOR
+    </div>
+  </div>
+</body>
+</html>

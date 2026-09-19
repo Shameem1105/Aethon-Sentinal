@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aethon Admin - Assessments</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    /* Inline sub-tab navigation for Assessments view */
+    .sub-nav-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+    .sub-nav-tab {
+      background: transparent;
+      border: none;
+      color: var(--gray-text);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 6px 12px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .sub-nav-tab.active {
+      color: var(--white);
+    }
+    .sub-nav-tab.active::after {
+      content: "";
+      position: absolute;
+      bottom: -13px;
+      left: 0; right: 0; height: 2px;
+      background-color: var(--primary);
+    }
+    .sub-panel {
+      display: none;
+      animation: pageFade 0.2s ease-out;
+    }
+    .sub-panel.active {
+      display: block;
+    }
+  </style>
+  <link rel="stylesheet" href="css/admin-agent.css">
+</head>
+<body>
+
+  
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <i class="ri-flashlight-line logo-icon"></i>
+      <span class="logo-text">Aethon Admin</span>
+    </div>
+    
+    <nav class="sidebar-menu">
+      <a href="admin.html" class="menu-item">
+        <i class="ri-dashboard-line"></i> Dashboard
+      </a>
+      <a href="admin-students.html" class="menu-item">
+        <i class="ri-group-line"></i> Students
+      </a>
+      <a href="admin-assessments.html" class="menu-item active">
+        <i class="ri-shield-line"></i> Assessments
+      </a>
+      <a href="admin-monitoring.html" class="menu-item">
+        <i class="ri-computer-line"></i> Monitoring
+      </a>
+      <a href="admin-violations.html" class="menu-item">
+        <i class="ri-error-warning-line"></i> Violations
+      </a>
+    </nav>
+    
+    <div class="sidebar-profile">
+      
+    </div>
+  </aside>
+
+  
+  <div class="main-content">
+    
+    
+    <header class="top-header">
+      <div class="breadcrumb">
+        <span>Global Environment</span>
+        <i class="ri-arrow-right-s-line"></i>
+        <span class="env-name">Production</span>
+      </div>
+      
+      <div class="header-actions">
+        
+        <div class="header-search">
+          <i class="ri-search-line"></i>
+          <input type="text" placeholder="Search logs, metrics...">
+        </div>
+        
+        <button class="bell-btn">
+          <i class="ri-notification-3-line"></i>
+        </button>
+      </div>
+    </header>
+
+    
+    <div class="page-container">
+      
+      <div class="page-title-block">
+        <h1 class="page-title">Assessments</h1>
+        <p class="page-subtitle">Manage tests, question banks, and candidate assignments.</p>
+      </div>
+
+      
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Total Assessments</span>
+            <i class="ri-file-text-line"></i>
+          </div>
+          <div class="metric-value" id="stats-total-assessments">0</div>
+          <div class="metric-footer">
+            <span>Registered exams</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Active Candidates</span>
+            <i class="ri-team-line"></i>
+          </div>
+          <div class="metric-value" id="stats-total-candidates">0</div>
+          <div class="metric-footer">
+            <span>Enrolled across slots</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Avg. Completion Time</span>
+            <i class="ri-time-line"></i>
+          </div>
+          <div class="metric-value">68m</div>
+          <div class="metric-footer">
+            <span>Computed from submissions</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Pass Rate</span>
+            <i class="ri-percent-line"></i>
+          </div>
+          <div class="metric-value">64%</div>
+          <div class="metric-footer">
+            <span>Target benchmark: 50%</span>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="sub-nav-bar">
+        <button class="sub-nav-tab active" onclick="switchSubPanel('list-panel', this)">Assessments List</button>
+        <button class="sub-nav-tab" onclick="switchSubPanel('upload-test-panel', this)">+ New Strict Test</button>
+        <button class="sub-nav-tab" onclick="switchSubPanel('upload-practice-panel', this)">+ New Practice</button>
+        <button class="sub-nav-tab" onclick="switchSubPanel('upload-ai-panel', this)">+ New AI Assessment</button>
+      </div>
+
+      
+      <div class="sub-panel active" id="list-panel">
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="header-search" style="margin-left: 0;">
+              <i class="ri-search-line"></i>
+              <input type="text" id="assessments-search-input" placeholder="Search assessments..." oninput="searchAssessments()">
+            </div>
+            
+            <div class="actions-row">
+              <button class="btn-outline" onclick="alert('Filtering tools coming soon!')">
+                <i class="ri-filter-3-line"></i> Filter
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="custom-table" id="assessments-table">
+              <thead>
+                <tr>
+                  <th>Assessment Name</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Candidates</th>
+                  <th>Duration</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--gray-text); padding: 40px 0;">Loading assessments...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="sub-panel" id="upload-test-panel">
+        <div class="uploader-box-style">
+          <h2>Create Strict Test</h2>
+          
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Test Title</label>
+            <input id="test_title" class="form-uploader-control" placeholder="e.g. Full Stack Engineering Final">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Start Date & Time</label>
+            <input id="test_start_time" class="form-uploader-control" type="datetime-local">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">End Date & Time</label>
+            <input id="test_end_time" class="form-uploader-control" type="datetime-local">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Description</label>
+            <textarea id="test_description" class="form-uploader-control" style="min-height: 80px;" placeholder="Outline test instructions..."></textarea>
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Total Time (minutes)</label>
+            <input id="test_time" class="form-uploader-control" type="number" placeholder="Duration e.g. 60">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Total Students Count</label>
+            <input id="test_email_count" class="form-uploader-control" type="number" placeholder="e.g. 5">
+          </div>
+
+          <button class="form-uploader-btn" style="background-color: transparent; border: 1px solid var(--border-color); color: white; margin-bottom: 14px;" onclick="generateEmailInputs('test')">Generate Email Inputs</button>
+          <div id="test_emailBox" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
+
+          <button class="form-uploader-btn" onclick="createAssessment('test')">Create Test Card</button>
+          <div id="testMsg" class="msg"></div>
+
+          <button class="form-uploader-btn" style="background-color: var(--success); border: none; margin-top: 10px;" onclick="openControls()">Manage Security Controls (Rules)</button>
+
+          <div class="form-uploader-group" style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+            <label class="form-uploader-label">Step 2: Upload Questions & Workspace Files (.json or .zip folder)</label>
+            <p style="font-size: 12px; color: var(--gray-text); margin-top: 4px; margin-bottom: 12px;">
+              Upload a <strong>JSON file</strong> (containing question title/testcases) OR a <strong>ZIP folder</strong> containing your starter workspace code files!
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+              <div>
+                <label style="font-size: 12px; font-weight: 600; color: #a78bfa; display: block; margin-bottom: 4px;">Option A: Questions & Test Cases (JSON File)</label>
+                <input type="file" id="test_jsonFile" class="form-uploader-control" accept=".json">
+              </div>
+              
+              <div>
+                <label style="font-size: 12px; font-weight: 600; color: #38bdf8; display: block; margin-bottom: 4px;">Option B: Starter Code Workspace (.zip Folder)</label>
+                <input type="file" id="test_zipFile" class="form-uploader-control" accept=".zip">
+              </div>
+            </div>
+
+            <button class="form-uploader-btn" style="margin-top: 16px; background-color: var(--info);" onclick="saveJsonQuestions('test')">Upload Questions & Code Workspace</button>
+            <div id="test_jsonMsg" class="msg" style="margin-top: 10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="sub-panel" id="upload-practice-panel">
+        <div class="uploader-box-style">
+          <h2>Create Practice Session</h2>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Practice Title</label>
+            <input id="practice_title" class="form-uploader-control" placeholder="e.g. JavaScript Arrays Practice">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Total Students Count</label>
+            <input id="practice_email_count" class="form-uploader-control" type="number" placeholder="e.g. 5">
+          </div>
+
+          <button class="form-uploader-btn" style="background-color: transparent; border: 1px solid var(--border-color); color: white; margin-bottom: 14px;" onclick="generateEmailInputs('practice')">Generate Email Inputs</button>
+          <div id="practice_emailBox" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
+
+          <button class="form-uploader-btn" onclick="createAssessment('practice')">Create Practice Card</button>
+          <div id="practiceMsg" class="msg"></div>
+
+          <div class="form-uploader-group" style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+            <label class="form-uploader-label">Step 2: Upload Questions (JSON File)</label>
+            <input type="file" id="practice_jsonFile" class="form-uploader-control" accept=".json" style="margin-top: 8px;">
+            <button class="form-uploader-btn" style="margin-top: 12px; background-color: var(--info);" onclick="saveJsonQuestions('practice')">Upload Questions</button>
+            <div id="practice_jsonMsg" class="msg"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Panel: Create AI Assessment -->
+      <div class="sub-panel" id="upload-ai-panel">
+        <div class="uploader-box-style">
+          <h2> Create Aethon AI Assessment</h2>
+          <p style="font-size: 13px; color: var(--gray-text); margin-bottom: 20px;">Deploy an AI-assisted debugging test with Socratic Copilot guardrails &amp; multi-file code workspace.</p>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Assessment Title *</label>
+            <input id="ai_title" class="form-uploader-control" placeholder="e.g. Aethon Sentinel - Array Out-of-Bounds Debugging">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Start Date & Time</label>
+            <input id="ai_start_time" class="form-uploader-control" type="datetime-local">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">End Date & Time</label>
+            <input id="ai_end_time" class="form-uploader-control" type="datetime-local">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Description</label>
+            <textarea id="ai_description" class="form-uploader-control" style="min-height: 80px;" placeholder="Outline test instructions & problem details..."></textarea>
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Total Time (minutes)</label>
+            <input id="ai_time" class="form-uploader-control" type="number" placeholder="Duration e.g. 60" value="60">
+          </div>
+
+          <div class="form-uploader-group">
+            <label class="form-uploader-label">Total Students Count</label>
+            <input id="ai_email_count" class="form-uploader-control" type="number" placeholder="e.g. 5">
+          </div>
+
+          <button class="form-uploader-btn" style="background-color: transparent; border: 1px solid var(--border-color); color: white; margin-bottom: 14px;" onclick="generateEmailInputs('ai')">Generate Email Inputs</button>
+          <div id="ai_emailBox" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
+
+          <button class="form-uploader-btn" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white;" onclick="createAssessment('ai')">🚀 Create AI Assessment Card</button>
+          <div id="aiMsg" class="msg" style="margin-top: 10px;"></div>
+
+          <button class="form-uploader-btn" style="background-color: var(--success); border: none; margin-top: 10px;" onclick="openControls()">Manage Security Controls (Rules)</button>
+
+          <div class="form-uploader-group" style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+            <label class="form-uploader-label">Step 2: Upload Questions & Starter Workspace (.json or .zip folder)</label>
+            <p style="font-size: 12px; color: var(--gray-text); margin-top: 4px; margin-bottom: 12px;">
+              Upload a <strong>JSON file</strong> (containing question title/testcases) OR a <strong>ZIP folder</strong> containing your starter workspace code files for the testpage!
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+              <div>
+                <label style="font-size: 12px; font-weight: 600; color: #a78bfa; display: block; margin-bottom: 4px;">Option A: Questions & Test Cases (JSON File)</label>
+                <input type="file" id="ai_jsonFile" class="form-uploader-control" accept=".json">
+              </div>
+              
+              <div>
+                <label style="font-size: 12px; font-weight: 600; color: #38bdf8; display: block; margin-bottom: 4px;">Option B: Starter Code Workspace (.zip Folder)</label>
+                <input type="file" id="ai_zipFile" class="form-uploader-control" accept=".zip">
+              </div>
+            </div>
+
+            <button class="form-uploader-btn" style="margin-top: 16px; background-color: var(--info);" onclick="saveJsonQuestions('ai')">Upload Questions & Workspace Files (ZIP)</button>
+            <div id="ai_jsonMsg" class="msg" style="margin-top: 10px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  
+  <div class="modal-overlay" id="edit-assessment-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Assessment</h3>
+        <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      </div>
+      
+      <input type="hidden" id="edit-id">
+      <input type="hidden" id="edit-type">
+
+      <div class="form-group">
+        <label for="edit-title">Title</label>
+        <input type="text" id="edit-title" class="form-control">
+      </div>
+
+      <div class="form-group" id="edit-description-group">
+        <label for="edit-description">Description</label>
+        <textarea id="edit-description" class="form-control"></textarea>
+      </div>
+
+      <div class="form-group" id="edit-start-group">
+        <label for="edit-start">Start Time</label>
+        <input type="datetime-local" id="edit-start" class="form-control">
+      </div>
+
+      <div class="form-group" id="edit-end-group">
+        <label for="edit-end">End Time</label>
+        <input type="datetime-local" id="edit-end" class="form-control">
+      </div>
+
+      <div class="form-group" id="edit-duration-group">
+        <label for="edit-duration">Duration (minutes)</label>
+        <input type="number" id="edit-duration" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="edit-emails">Assigned Student Emails (comma separated)</label>
+        <textarea id="edit-emails" class="form-control" placeholder="student1@gmail.com, student2@gmail.com"></textarea>
+      </div>
+
+      <div id="editMsg" style="text-align: center; min-height: 22px; font-size: 13px; margin: 10px 0;"></div>
+
+      <div class="modal-footer">
+        <button class="btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="triggerDeleteAssessment()">Delete Assessment</button>
+        <div style="margin-right: auto;"></div>
+        <button class="btn-outline" onclick="closeEditModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitEditAssessment()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="js/admin-common.js"></script>
+  <script src="js/admin-assessments.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="js/admin-agent.js"></script>
+
+</body>
+</html>

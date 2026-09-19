@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collect Feedback</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --primary: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      position: relative;
+      overflow-x: hidden;
+      background-color: #070b14;
+    }
+
+    /* Ambient Deep Light Field */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      pointer-events: none;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(139, 92, 246, 0.25) 0%, transparent 40%),
+        radial-gradient(circle at 70% 60%, rgba(96, 165, 250, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 50% 20%, rgba(45, 212, 191, 0.15) 0%, transparent 35%);
+      filter: blur(80px);
+      animation: ambientDrift 30s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Spatial Mesh Overlay */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: -1;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
+      opacity: 0.8;
+    }
+
+    @keyframes ambientDrift {
+      0% {
+        transform: rotate(0deg) scale(1) translate(0, 0);
+      }
+
+      50% {
+        transform: rotate(3deg) scale(1.1) translate(3%, 2%);
+      }
+
+      100% {
+        transform: rotate(-2deg) scale(1.05) translate(-2%, -3%);
+      }
+    }
+
+    .container {
+      background: rgba(15, 10, 25, 0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 0 50px rgba(139, 92, 246, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(to right, #a78bfa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+      padding: 1.5rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-group:hover {
+      transform: translateY(-2px);
+      border-color: rgba(139, 92, 246, 0.3);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group label i {
+      color: #a78bfa;
+      font-size: 1.2rem;
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 0.5rem;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+
+    .star-rating input {
+      display: none;
+    }
+
+    .star-rating label {
+      cursor: pointer;
+      font-size: 2rem;
+      color: #334155;
+      transition: color 0.2s;
+      margin: 0;
+    }
+
+    .star-rating input:checked~label {
+      color: #fbbf24;
+      text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+    }
+
+    select,
+    input[type="text"] {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: white;
+      border-radius: 0.75rem;
+      outline: none;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    select option {
+      background-color: #0f172a;
+      color: white;
+      padding: 10px;
+    }
+
+    select:focus,
+    input[type="text"]:focus {
+      border-color: #a78bfa;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(139, 92, 246, 0.15);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 1.1rem;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 1rem;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+      text-transform: uppercase;
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 1.5rem;
+      }
+
+      .form-group {
+        padding: 1rem;
+      }
+
+      .star-rating label {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Assessment Feedback</h1>
+      <p>Please share your experience so we can improve the platform.</p>
+    </div>
+
+    <form id="feedbackForm">
+
+      <div class="form-group">
+        <label><i class="ri-star-line"></i> Overall Assessment Rating</label>
+        <div class="star-rating">
+          <input type="radio" id="o5" name="overall_rating" value="5" required><label for="o5"
+            class="ri-star-fill"></label>
+          <input type="radio" id="o4" name="overall_rating" value="4"><label for="o4" class="ri-star-fill"></label>
+          <input type="radio" id="o3" name="overall_rating" value="3"><label for="o3" class="ri-star-fill"></label>
+          <input type="radio" id="o2" name="overall_rating" value="2"><label for="o2" class="ri-star-fill"></label>
+          <input type="radio" id="o1" name="overall_rating" value="1"><label for="o1" class="ri-star-fill"></label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="ri-bar-chart-line"></i> Assessment Difficulty</label>
+        <div class="star-rating">
+          <input type="radio" id="d5" name="difficulty_rating" value="5" required><label for="d5"
+            class="ri-star-fill"></label>
+          <input type="radio" id="d4" name="difficulty_rating" value="4"><label for="d4" class="ri-star-fill"></label>
+          <input type="radio" id="d3" name="difficulty_rating" value="3"><label for="d3" class="ri-star-fill"></label>
+          <input type="radio" id="d2" name="difficulty_rating" value="2"><label for="d2" class="ri-star-fill"></label>
+          <input type="radio" id="d1" name="difficulty_rating" value="1"><label for="d1" class="ri-star-fill"></label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="ri-lightbulb-line"></i> Question Clarity</label>
+        <div class="star-rating">
+          <input type="radio" id="c5" name="clarity_rating" value="5" required><label for="c5"
+            class="ri-star-fill"></label>
+          <input type="radio" id="c4" name="clarity_rating" value="4"><label for="c4" class="ri-star-fill"></label>
+          <input type="radio" id="c3" name="clarity_rating" value="3"><label for="c3" class="ri-star-fill"></label>
+          <input type="radio" id="c2" name="clarity_rating" value="2"><label for="c2" class="ri-star-fill"></label>
+          <input type="radio" id="c1" name="clarity_rating" value="1"><label for="c1" class="ri-star-fill"></label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="ri-macbook-line"></i> Platform Experience</label>
+        <div class="star-rating">
+          <input type="radio" id="p5" name="platform_experience" value="5" required><label for="p5"
+            class="ri-star-fill"></label>
+          <input type="radio" id="p4" name="platform_experience" value="4"><label for="p4" class="ri-star-fill"></label>
+          <input type="radio" id="p3" name="platform_experience" value="3"><label for="p3" class="ri-star-fill"></label>
+          <input type="radio" id="p2" name="platform_experience" value="2"><label for="p2" class="ri-star-fill"></label>
+          <input type="radio" id="p1" name="platform_experience" value="1"><label for="p1" class="ri-star-fill"></label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="ri-thumb-up-line"></i> Recommendation</label>
+        <select name="recommendation" required>
+          <option value="" disabled selected>Select an option</option>
+          <option value="Definitely">Definitely</option>
+          <option value="Maybe">Maybe</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label><i class="ri-file-list-3-line"></i> Preferred Assessment Type</label>
+        <select name="preferred_type" required>
+          <option value="" disabled selected>Select an option</option>
+          <option value="No Preference">No Preference</option>
+          <option value="Coding">Coding</option>
+          <option value="Objective">Objective</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label><i class="ri-error-warning-line"></i> Platform Issues</label>
+        <select name="platform_issues" required>
+          <option value="" disabled selected>Select an option</option>
+          <option value="None">None</option>
+          <option value="Lag">Lag / Slow loading</option>
+          <option value="Crash">Platform Crashed</option>
+          <option value="UI Bug">UI Bug / Glitch</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-submit">Submit Feedback</button>
+
+    </form>
+
+    <div id="successMessage" style="display: none; text-align: center; padding: 2rem 0;">
+      <div
+        style="width: 80px; height: 80px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 1.5rem;">
+        <i class="ri-check-line"></i>
+      </div>
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #f8fafc;">Feedback Recorded</h2>
+      <p style="color: #94a3b8; margin-bottom: 2rem;">Thank you! Your feedback has been recorded successfully.</p>
+      <button class="btn-submit" onclick="returnToDashboard()"
+        style="max-width: 240px; margin: 0 auto; display: block;">Return to AI Assessments</button>
+    </div>
+  </div>
+
+  <script>
+    function returnToDashboard() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isAi = urlParams.get('type') === 'ai' || localStorage.getItem('last_test_type') === 'ai_assessment';
+      window.location.href = isAi ? 'ai-assessments.html' : 'ai-assessments.html';
+    }
+  </script>
+
+  <style>
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+    }
+  </style>
+
+  <script>
+    function showToast(message, type = "success") {
+      const existing = document.getElementById("toast-container");
+      if (existing) existing.remove();
+
+      const container = document.createElement("div");
+      container.id = "toast-container";
+      container.style.position = "fixed";
+      container.style.top = "24px";
+      container.style.right = "24px";
+      container.style.zIndex = "99999";
+      container.style.display = "flex";
+      container.style.flexDirection = "column";
+      container.style.gap = "8px";
+      container.style.pointerEvents = "none";
+
+      const isError = type === "error";
+      const isWarning = type === "warning";
+      const isSuccess = type === "success";
+
+      const bg = isError
+        ? "#991b1b"
+        : isWarning
+          ? "#854d0e"
+          : isSuccess
+            ? "#166534"
+            : "#1e40af";
+
+      const icon = isError ? "ri-error-warning-fill" : isSuccess ? "ri-check-line" : "ri-information-fill";
+
+      const toast = document.createElement("div");
+      toast.style.background = bg;
+      toast.style.color = "white";
+      toast.style.padding = "10px 16px";
+      toast.style.borderRadius = "10px";
+      toast.style.fontWeight = "600";
+      toast.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.35)";
+      toast.style.display = "flex";
+      toast.style.alignItems = "center";
+      toast.style.gap = "8px";
+      toast.style.fontSize = "13px";
+      toast.style.pointerEvents = "none";
+      toast.style.animation = "slideIn 0.3s ease-out forwards";
+
+      toast.innerHTML = `<i class="${icon}" style="font-size: 16px; color: white"></i> <span>${message.split(" ").slice(0, 4).join(" ")}</span>`;
+
+      container.appendChild(toast);
+      document.body.appendChild(container);
+
+      setTimeout(() => {
+        toast.style.animation = "fadeOut 0.3s ease-out forwards";
+        setTimeout(() => container.remove(), 300);
+      }, 3000);
+    }
+
+    document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const assessmentId = urlParams.get('id') || '1';
+      const studentEmail = localStorage.getItem('userEmail') || 'student@example.com';
+
+      const formData = new FormData(e.target);
+      const data = {
+        assessment_id: assessmentId,
+        student_email: studentEmail,
+        overall_rating: formData.get('overall_rating') || 5,
+        difficulty_rating: formData.get('difficulty_rating') || 'Medium',
+        clarity_rating: formData.get('clarity_rating') || 5,
+        platform_experience: formData.get('platform_experience') || 'Good',
+        recommendation: formData.get('recommendation') || 5,
+        preferred_type: formData.get('preferred_type') || 'Coding',
+        platform_issues: formData.get('platform_issues') || 'None'
+      };
+
+      // Set localStorage flags so client UI updates immediately!
+      if (assessmentId) {
+        localStorage.setItem('feedback_given_' + assessmentId, 'true');
+      }
+
+      try {
+        await fetch("/submit-feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+      } catch (err) {
+        console.error(err);
+      }
+
+      showToast("Feedback submitted successfully!", "success");
+      document.getElementById('feedbackForm').style.display = 'none';
+      document.getElementById('successMessage').style.display = 'block';
+      if (document.querySelector('.header')) {
+        document.querySelector('.header').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+
+</html>

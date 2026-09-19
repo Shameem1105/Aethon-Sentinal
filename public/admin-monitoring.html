@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aethon Admin - Live Monitoring</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin-agent.css">
+</head>
+<body>
+
+  
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <i class="ri-flashlight-line logo-icon"></i>
+      <span class="logo-text">Aethon Admin</span>
+    </div>
+    
+    <nav class="sidebar-menu">
+      <a href="admin.html" class="menu-item">
+        <i class="ri-dashboard-line"></i> Dashboard
+      </a>
+      <a href="admin-students.html" class="menu-item">
+        <i class="ri-group-line"></i> Students
+      </a>
+      <a href="admin-assessments.html" class="menu-item">
+        <i class="ri-shield-line"></i> Assessments
+      </a>
+      <a href="admin-monitoring.html" class="menu-item active">
+        <i class="ri-computer-line"></i> Monitoring
+      </a>
+      <a href="admin-violations.html" class="menu-item">
+        <i class="ri-error-warning-line"></i> Violations
+      </a>
+      
+      
+      <span class="menu-label">AI Agent</span>
+      
+      <a href="#" class="menu-item" onclick="openAgent(); return false;" style="color: #c084fc;">
+        <i class="ri-sparkling-fill" style="color: #c084fc;"></i> Aethon Intelligence
+      </a>
+      <a href="admin-prompts.html" class="menu-item" style="color: #c084fc;">
+        <i class="ri-book-read-line" style="color: #c084fc;"></i> Prompt Library
+      </a>
+      
+    </nav>
+    
+    <div class="sidebar-profile">
+      
+    </div>
+  </aside>
+
+  
+  <div class="main-content">
+    
+    
+    <header class="top-header">
+      <div class="breadcrumb">
+        <span>Global Environment</span>
+        <i class="ri-arrow-right-s-line"></i>
+        <span class="env-name">Production</span>
+      </div>
+      
+      <div class="header-actions">
+        
+        <div class="header-search">
+          <i class="ri-search-line"></i>
+          <input type="text" placeholder="Search logs, metrics...">
+        </div>
+        
+        <button class="bell-btn">
+          <i class="ri-notification-3-line"></i>
+        </button>
+      </div>
+    </header>
+
+    
+    <div class="page-container">
+      
+      <div class="page-title-block">
+        <h1 class="page-title">Live Monitoring</h1>
+        <p class="page-subtitle">Real-time proctoring grid for active assessments.</p>
+      </div>
+
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="live-badge-row">
+          <span class="badge active" style="font-size: 13px; padding: 6px 12px;">
+            <span style="display: inline-block; width: 8px; height: 8px; background-color: var(--success); border-radius: 50%; margin-right: 6px; animation: flash 1s infinite alternate;"></span>
+            124 Active
+          </span>
+          <span class="badge flagged" style="font-size: 13px; padding: 6px 12px;">
+            <i class="ri-error-warning-line" style="margin-right: 4px;"></i>
+            3 Flagged
+          </span>
+        </div>
+
+        <button class="btn-outline" id="autofocus-btn" onclick="toggleAutoFocus()">
+          <i class="ri-focus-3-line"></i> AI Auto-Focus
+        </button>
+      </div>
+
+      
+      <div class="monitoring-grid" id="monitoring-grid">
+        
+        <div style="text-align: center; color: var(--gray-text); padding: 80px 0; grid-column: 1 / -1;">Initializing live stream connections...</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/admin-common.js"></script>
+  <script src="js/admin-monitoring.js"></script>
+
+  
+  <div id="agent-overlay" class="agent-overlay">
+    <div class="agent-sidebar">
+      <div class="sidebar-header">
+        <h3>Recent Chats</h3>
+        <button onclick="newChat()"><i class="ri-add-line"></i></button>
+      </div>
+      <div id="agent-history-list" class="history-list">
+        
+      </div>
+    </div>
+    
+    <div class="agent-main">
+      <div class="agent-topbar">
+        <div class="agent-brand">
+          <div class="agent-orb"></div>
+          <span>Aethon Intelligence</span>
+        </div>
+        <div class="agent-topbar-actions">
+          <span class="live-badge"><span class="dot"></span> Live</span>
+          <button class="new-chat-btn" onclick="newChat()"><i class="ri-add-line"></i> New chat</button>
+          <button class="close-agent-btn" onclick="closeAgent()"><i class="ri-close-line"></i></button>
+        </div>
+      </div>
+
+      <div id="agent-chat-container" class="agent-chat-container">
+        
+        <div id="agent-welcome" class="agent-welcome">
+          <div class="big-orb"></div>
+          <h2>How can I help you today?</h2>
+          <p>Ask anything about students, assessments, departments, or institutional performance.</p>
+          
+          <div class="agent-greeting-bubble">
+            <div class="agent-orb mini"></div>
+            <div class="greeting-content">
+              <h4>Aethon</h4>
+              <p>Hello! I'm Aethon Intelligence, your AI-powered academic data analyst. I can help you query student records, generate reports, analyze assessment data, and surface actionable insights across your institution.</p>
+            </div>
+          </div>
+
+          <div class="suggested-prompts">
+            <button onclick="sendSuggested('Show students who failed the latest coding assessment')">Show students who failed the latest coding assessment</button>
+            <button onclick="sendSuggested('Find students with security violations')">Find students with security violations</button>
+            <button onclick="sendSuggested('Show performance analytics by department')">Show performance analytics by department</button>
+            <button onclick="sendSuggested('Identify students at academic risk')">Identify students at academic risk</button>
+          </div>
+
+        </div>
+
+        <div id="agent-messages" class="agent-messages" style="display:none;"></div>
+      </div>
+
+      <div class="agent-input-area">
+        <div class="agent-input-wrapper">
+          <input type="text" id="agent-input" placeholder="Ask Aethon about students, assessments, reports..." onkeypress="handleAgentEnter(event)">
+          <div class="input-actions">
+            <button><i class="ri-mic-line"></i></button>
+            <button class="send-btn" onclick="sendAgentMessage()"><i class="ri-send-plane-2-fill"></i></button>
+          </div>
+        </div>
+        <p class="agent-disclaimer">Aethon Intelligence can make mistakes. Verify important decisions.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="js/admin-agent.js"></script>
+
+</body>
+</html>
